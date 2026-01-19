@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FitPass",
+  title: "FleXora",
   description: "Book fitness classes with ease",
 };
 
@@ -23,9 +23,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         {children}
       </body>

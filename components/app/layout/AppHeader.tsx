@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation"; // Add useRouter
 import {
   SignedIn,
   SignedOut,
@@ -28,6 +28,7 @@ const navItems = [
 
 export function AppHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const { isSignedIn } = useAuth();
   const [open, setOpen] = useState(false);
 
@@ -36,16 +37,23 @@ export function AppHeader() {
     return null;
   }
 
+  // Handle logo click
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push(isSignedIn ? "/classes" : "/");
+  };
+
   return (
     <header className="border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link
-          href={isSignedIn ? "/classes" : "/"}
+        {/* Fix: Use button with onClick instead of conditional href */}
+        <button
+          onClick={handleLogoClick}
           className="flex items-center gap-2 text-xl font-bold"
         >
           <Dumbbell className="h-6 w-6 text-primary" />
           <span>FitPass</span>
-        </Link>
+        </button>
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">
@@ -148,4 +156,3 @@ export function AppHeader() {
     </header>
   );
 }
-

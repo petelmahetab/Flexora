@@ -1,4 +1,5 @@
 import { SignUpButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import Link from "next/link";
 import {
   Dumbbell,
@@ -30,6 +31,8 @@ import {
   FREE_TRIAL_DAYS,
   type Tier,
 } from "@/lib/constants/subscription";
+import { Navbar } from "@/components/ui/Navbar";
+
 
 const categories = [
   { name: "Yoga", icon: Heart, classes: "2,400+", color: "text-rose-500" },
@@ -81,12 +84,13 @@ const steps = [
 export default function HomePage() {
   return (
     <div className="min-h-screen">
+      <Navbar/>
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/10" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-primary/15 to-transparent rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+        <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-background to-primary/10" />
+        <div className="absolute top-0 right-0 w-150 h-150 bg-linear-to-bl from-primary/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-100 h-100 bg-linear-to-tr from-primary/15 to-transparent rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
 
         <div className="container relative mx-auto px-4 py-24 md:py-32 lg:py-40">
           <div className="max-w-4xl mx-auto text-center">
@@ -239,11 +243,10 @@ export default function HomePage() {
             return (
               <Card
                 key={tier}
-                className={`relative transition-all duration-300 hover:shadow-xl ${
-                  isPopular
+                className={`relative transition-all duration-300 hover:shadow-xl ${isPopular
                     ? "border-primary shadow-lg scale-105 md:scale-110"
                     : "hover:-translate-y-1"
-                }`}
+                  }`}
               >
                 {isPopular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -372,6 +375,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
+     
       <footer className="border-t bg-muted/20">
         <div className="container mx-auto px-4 py-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -392,9 +396,14 @@ export default function HomePage() {
                 Pricing
               </Link>
             </div>
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} FitPass. All rights reserved.
-            </p>
+
+            {/* Add Theme Toggle Here */}
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
+              <p className="text-sm text-muted-foreground">
+                © {new Date().getFullYear()} FitPass. All rights reserved.
+              </p>
+            </div>
           </div>
         </div>
       </footer>

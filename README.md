@@ -68,7 +68,7 @@ Before diving into the code, you'll need accounts with these services.
 | **Mapbox** | Address Autocomplete | [Sign up for Mapbox](https://account.mapbox.com/) |
 | **Vercel** | Hosting & AI Gateway | [Sign up for Vercel](https://vercel.com/) |
 
-> 📦 **Want the source code?** [Get it here](https://www.papareact.com/class-booking-platform-build-form)
+
 
 **Why use these links?**
 - ✅ Same pricing as going direct (no extra cost to you)

@@ -1,30 +1,46 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+// import "./globals.css";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ClerkProvider } from "@clerk/nextjs";
-import { OnboardingGuard } from "@/components/app/onboarding/OnboardingGuard";
-import { AppHeader } from "@/components/app/layout/AppHeader";
-import { ChatStoreProvider } from "@/lib/store/chat-store-provider";
-import { AppShell } from "@/components/app/layout/AppShell";
-import { ChatSheet } from "@/components/app/chat/ChatSheet";
-import { ChatButton } from "@/components/app/chat/ChatButton";
-import { SanityLive } from "@/sanity/lib/live";
 
-export default function AppLayout({
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "FitPass",
+  description: "Book fitness classes with ease",
+};
+
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <ClerkProvider>
-      <ChatStoreProvider>
-        <AppShell>
-          <OnboardingGuard>
-            <AppHeader />
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          suppressHydrationWarning
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             {children}
-          </OnboardingGuard>
-        </AppShell>
-        <ChatButton />
-        <ChatSheet />
-        <SanityLive />
-      </ChatStoreProvider>
+          </ThemeProvider>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }

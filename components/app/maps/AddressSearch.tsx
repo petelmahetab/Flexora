@@ -28,7 +28,12 @@ interface MapboxFeature {
   context?: MapboxContext[];
 }
 
-function extractAddressComponents(feature: MapboxFeature) {
+function extractAddressComponents(feature: MapboxFeature): {
+  street: string;
+  city: string;
+  postcode: string;
+  country: string;
+} {
   const context = feature.context || [];
   let street = "";
   let city = "";
@@ -44,6 +49,8 @@ function extractAddressComponents(feature: MapboxFeature) {
 
   // Extract components from context
   for (const item of context) {
+    if (!item?.id || !item?.text) continue;
+
     if (item.id.startsWith("place")) {
       city = item.text;
     } else if (item.id.startsWith("locality")) {
@@ -75,32 +82,43 @@ export function AddressSearch({
   const [suggestions, setSuggestions] = useState<MapboxFeature[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const debouncedQuery = useDebounce(query, 300);
 
   const searchAddress = useCallback(async (searchQuery: string) => {
     if (searchQuery.length < 3) {
       setSuggestions([]);
+      setError(null);
       return;
     }
 
     const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
     if (!token) {
       console.error("Mapbox access token not configured");
+      setError("Map service not configured");
       return;
     }
 
     setIsLoading(true);
+    setError(null);
+
     try {
       const response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
           searchQuery
-        )}.json?access_token=${token}&types=address,place,locality,neighborhood`
+        )}.json?access_token=${token}&types=address,place,locality,neighborhood&limit=5`
       );
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
       const data = await response.json();
       setSuggestions(data.features || []);
     } catch (error) {
       console.error("Error fetching address:", error);
+      setError("Failed to search addresses");
       setSuggestions([]);
     } finally {
       setIsLoading(false);
@@ -114,10 +132,23 @@ export function AddressSearch({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
+    setError(null);
   };
 
   const handleSelect = (feature: MapboxFeature) => {
     const [lng, lat] = feature.center;
+
+    // Validate coordinates
+    if (
+      typeof lng !== "number" ||
+      typeof lat !== "number" ||
+      isNaN(lng) ||
+      isNaN(lat)
+    ) {
+      setError("Invalid coordinates received");
+      return;
+    }
+
     const components = extractAddressComponents(feature);
     onChange({
       lat,
@@ -128,12 +159,14 @@ export function AddressSearch({
     setQuery(feature.place_name);
     setSuggestions([]);
     setIsFocused(false);
+    setError(null);
   };
 
   const handleClear = () => {
     onChange(null);
     setQuery("");
     setSuggestions([]);
+    setError(null);
   };
 
   const isSearching = query !== debouncedQuery;
@@ -149,7 +182,10 @@ export function AddressSearch({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           placeholder={placeholder}
-          className="w-full rounded-lg border border-input bg-background py-3 pl-10 pr-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          className={cn(
+            "w-full rounded-lg border bg-background py-3 pl-10 pr-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+            error ? "border-destructive" : "border-input"
+          )}
         />
         {(isLoading || isSearching) && (
           <LoaderIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
@@ -158,22 +194,27 @@ export function AddressSearch({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <XIcon className="h-4 w-4" />
           </button>
         )}
       </div>
 
+      {/* Error message */}
+      {error && (
+        <p className="mt-1 text-xs text-destructive">{error}</p>
+      )}
+
       {/* Suggestions dropdown */}
       {isFocused && suggestions.length > 0 && (
         <div className="absolute z-50 mt-1 w-full rounded-lg border bg-popover shadow-lg">
-          {suggestions.map((suggestion) => (
+          {suggestions.map((suggestion, index) => (
             <button
-              key={suggestion.place_name}
+              key={`${suggestion.place_name}-${index}`}
               type="button"
               onClick={() => handleSelect(suggestion)}
-              className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm first:rounded-t-lg last:rounded-b-lg hover:bg-accent"
+              className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm first:rounded-t-lg last:rounded-b-lg hover:bg-accent transition-colors"
             >
               <MapPinIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
               <span className="line-clamp-2">{suggestion.place_name}</span>
