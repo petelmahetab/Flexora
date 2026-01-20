@@ -62,16 +62,7 @@ export function ClassesMapSidebar({
   highlightedVenueId,
   onVenueClick,
 }: ClassesMapSidebarProps) {
-  // Count how many classes each venue has (venues array contains duplicates per class)
-  const venueCounts = venues.reduce(
-    (acc, venue) => {
-      acc[venue._id] = (acc[venue._id] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
-
-  // Deduplicate venues by _id and filter to only those with valid coordinates
+  // FIRST: Deduplicate venues by _id and filter to only those with valid coordinates
   // Map key = venue._id ensures uniqueness, .values() extracts the venue objects
   const uniqueVenues = useMemo(
     () =>
@@ -80,9 +71,11 @@ export function ClassesMapSidebar({
           venues
             .filter(
               (v) =>
-                v.address &&
+                v?.address &&
                 typeof v.address.lat === "number" &&
-                typeof v.address.lng === "number"
+                typeof v.address.lng === "number" &&
+                !isNaN(v.address.lat) &&
+                !isNaN(v.address.lng)
             )
             .map((v) => [v._id, v])
         ).values()
@@ -90,12 +83,24 @@ export function ClassesMapSidebar({
     [venues]
   );
 
+  // THEN: Count how many classes each venue has (only for valid venues)
+  // venues array contains duplicates per class, so we count them
+  const venueCounts = useMemo(() => {
+    return venues.reduce((acc, venue) => {
+      // Only count if this venue passed our validity checks
+      if (uniqueVenues.some((uv) => uv._id === venue._id)) {
+        acc[venue._id] = (acc[venue._id] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+  }, [venues, uniqueVenues]);
+
   // All [lat, lng] coordinates the map should fit in view
   // Includes venue locations + user's home location for context
   const boundsPoints = useMemo(() => {
     const pts: [number, number][] = uniqueVenues.map((v) => [
-      v.address?.lat ?? 0,
-      v.address?.lng ?? 0,
+      v.address!.lat!, // Safe to use ! because we filtered for valid coordinates
+      v.address!.lng!,
     ]);
     pts.push([userLocation.lat, userLocation.lng]);
     return pts;
@@ -202,4 +207,3 @@ export function ClassesMapSidebar({
     </div>
   );
 }
-
