@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FitPass",
+  title: "FleXora",
   description: "Book fitness classes with ease",
 };
 
