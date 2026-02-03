@@ -574,28 +574,6 @@ See [LICENSE.md](LICENSE.md) for the full license text.
 
 ---
 
-## 🙏 Acknowledgments
-
-Built with love by [Sonny Sangha](https://www.youtube.com/@SonnySangha) and the PAPAFAM community.
-
-- [Next.js](https://nextjs.org/) - The React framework
-- [Sanity](https://www.sanity.io/sonny?utm_source=youtube&utm_medium=video&utm_content=class-booking-platform) - Structured content platform 💛
-- [Clerk](https://go.clerk.com/84o4rVF) - Authentication and billing 💛
-- [Vercel](https://vercel.com/) - Deployment and AI gateway
-- [Mapbox](https://www.mapbox.com/) - Maps and geocoding
-- [shadcn/ui](https://ui.shadcn.com/) - Beautiful UI components
-
----
-
-## 💛 Support This Project
-
-**Enjoyed this project?** Here's how you can help:
-
-1. ⭐ **Star this repo** - It helps others discover it
-2. 📺 **Subscribe** to [Sonny Sangha on YouTube](https://www.youtube.com/@SonnySangha)
-3. 🔗 **Use the affiliate links** when signing up for services (no extra cost to you!)
-4. 📣 **Share** this project with fellow developers
-5. 🎓 **Join [PAPAFAM](https://www.papareact.com/course)** for more in-depth learning
 
 Every little bit helps me continue creating free educational content for the developer community. Thank you! 🙏
 
